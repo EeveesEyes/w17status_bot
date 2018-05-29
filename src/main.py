@@ -2,6 +2,7 @@ from telegram.ext import Updater, CommandHandler
 import logging
 import urllib.request
 import json
+import os.path
 
 url = 'https://api.chaos-darmstadt.de'
 response = urllib.request.urlopen(url)
@@ -61,7 +62,7 @@ def join_updater(bot, update):
                      text='Du bekommst nun Updates, sobald sich etwas ändert')
     print(chats)
     data["chats"] = chats
-    with open("chats.json", "w") as jsonFile:
+    with open("chats.json", "w+") as jsonFile:
         json.dump(data, jsonFile)
 
 
@@ -72,22 +73,31 @@ def leave_updater(bot, update):
                      text='Du bekommst nun keine Updates mehr')
     print(chats)
     data["chats"] = chats
-    with open("chats.json", "w") as jsonFile:
+    with open("chats.json", "w+") as jsonFile:
         json.dump(data, jsonFile)
 
 
 
-with open('conf.json') as f:
-    config = json.load(f)
-with open("chats.json", "r") as jsonFile:
-    data = json.load(jsonFile)
-chats = data["chats"]
+if os.path.isfile('./conf.json'):
+    with open('conf.json') as f:
+        config = json.load(f)
+else:
+    raise EnvironmentError("Config file not existent or wrong format")
 
-#debug
-chats[252269446] = True
-data["chats"] = chats
-with open("chats.json", "w") as jsonFile:
-    json.dump(data, jsonFile)
+if os.path.isfile('./chats.json'):
+    with open("chats.json", "r") as jsonFile:
+        data = json.load(jsonFile)
+        chats = data["chats"]
+else:
+    data = {}
+    data["chats"] = {}
+    chats = {}
+    # debug
+    chats[252269446] = True
+    data["chats"] = chats
+    with open("chats.json", "w+") as jsonFile:
+        json.dump(data, jsonFile)
+
 
 updater = Updater(token=config["token"])
 dispatcher = updater.dispatcher
