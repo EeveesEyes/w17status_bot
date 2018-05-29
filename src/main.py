@@ -57,24 +57,37 @@ def start(bot, update):
 
 def join_updater(bot, update):
     global chats
-    chats[update.message.chat_id] = True
+    chats[str(update.message.chat_id)] = True
     bot.send_message(chat_id=update.message.chat_id,
                      text='Du bekommst nun Updates, sobald sich etwas ändert')
     print(chats)
     data["chats"] = chats
-    with open("chats.json", "w+") as jsonFile:
-        json.dump(data, jsonFile)
+    if os.path.isfile('./chats.json'):
+        print('chats.json existing')
+        with open("chats.json", "w") as jsonFile:
+            json.dump(data, jsonFile)
+    else:
+        print('chats.json existing, creating...')
+        with open("chats.json", "w+") as jsonFile:
+            json.dump(data, jsonFile)
 
 
 def leave_updater(bot, update):
     global chats
-    chats[update.message.chat_id] = False
+    chats[str(update.message.chat_id)] = False
     bot.send_message(chat_id=update.message.chat_id,
                      text='Du bekommst nun keine Updates mehr')
     print(chats)
     data["chats"] = chats
-    with open("chats.json", "w+") as jsonFile:
-        json.dump(data, jsonFile)
+    if os.path.isfile('./chats.json'):
+        print('chats.json existing')
+        with open("chats.json", "w") as jsonFile:
+            json.dump(data, jsonFile)
+    else:
+        print('chats.json existing, creating...')
+        with open("chats.json", "w+") as jsonFile:
+            json.dump(data, jsonFile)
+
 
 
 
@@ -85,6 +98,7 @@ else:
     raise EnvironmentError("Config file not existent or wrong format")
 
 if os.path.isfile('./chats.json'):
+    print('chats.json existing')
     with open("chats.json", "r") as jsonFile:
         data = json.load(jsonFile)
         chats = data["chats"]
@@ -93,8 +107,9 @@ else:
     data["chats"] = {}
     chats = {}
     # debug
-    chats[252269446] = True
+    #chats[252269446] = True
     data["chats"] = chats
+    print('chats.json existing, creating...')
     with open("chats.json", "w+") as jsonFile:
         json.dump(data, jsonFile)
 
